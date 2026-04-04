@@ -375,6 +375,16 @@ textarea.input {
   min-height: 80px;
 }
 
+/* Fix browser autofill styling for dark mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+  -webkit-box-shadow: 0 0 0 30px var(--surface-container-lowest) inset !important;
+  -webkit-text-fill-color: var(--on-surface) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* --- Cards: "Separation of Space" (no divider lines!) --- */
 .card {
   background: var(--surface-container-high);
@@ -413,6 +423,7 @@ textarea.input {
   max-width: 480px;
   margin: 0 auto;
   padding: 0 var(--space-md);
+  position: relative;
 }
 
 @media (min-width: 768px) {

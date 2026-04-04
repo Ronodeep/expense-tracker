@@ -123,7 +123,7 @@ export default function Charts() {
           <BarChart data={paidData} layout="vertical" margin={{ left: 60 }}>
             <XAxis type="number" hide />
             <YAxis type="category" dataKey="name" tick={{ fill: 'var(--on-surface)', fontSize: 12 }} width={60} />
-            <Tooltip content={customTooltip} />
+            <Tooltip content={customTooltip} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
             <Bar dataKey="value" fill="var(--primary-container)" radius={[0, 8, 8, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -136,7 +136,7 @@ export default function Charts() {
           <BarChart data={shareData} layout="vertical" margin={{ left: 60 }}>
             <XAxis type="number" hide />
             <YAxis type="category" dataKey="name" tick={{ fill: 'var(--on-surface)', fontSize: 12 }} width={60} />
-            <Tooltip content={customTooltip} />
+            <Tooltip content={customTooltip} cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }} />
             <Bar dataKey="value" fill="var(--secondary-container)" radius={[0, 8, 8, 0]} />
           </BarChart>
         </ResponsiveContainer>
