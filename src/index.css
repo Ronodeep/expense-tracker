@@ -743,3 +743,11 @@ input:-webkit-autofill:active{
   font-size: 0.6875rem;
   letter-spacing: 0.03em;
 }
+
+/* --- Recharts Overrides --- */
+.recharts-wrapper, 
+.recharts-surface, 
+.recharts-sector, 
+.recharts-layer {
+  outline: none !important;
+}

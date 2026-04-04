@@ -1,20 +1,105 @@
 import { Outlet, NavLink, Link } from 'react-router-dom'
+import { useState } from 'react'
 import Copyright from './Copyright'
 import { useGroup } from '../hooks/useGroup'
 
 export default function Layout() {
-  const { groupId, currentMember } = useGroup()
+  const { group, groupId, currentMember } = useGroup()
+  const [copied, setCopied] = useState(false)
+
+  async function copyCode() {
+    if (!group) return
+    try {
+      await navigator.clipboard.writeText(group.code)
+    } catch {
+      const input = document.createElement('input')
+      input.value = group.code
+      document.body.appendChild(input)
+      input.select()
+      document.execCommand('copy')
+      document.body.removeChild(input)
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <>
       <main className="container">
-        {currentMember && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '16px', paddingRight: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--surface-container-highest)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--on-surface-variant)', border: '1px solid rgba(74, 68, 85, 0.3)' }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--secondary)', boxShadow: '0 0 8px var(--secondary)' }} />
-              {currentMember.name}
-            </div>
-          </div>
+        {(group || currentMember) && (
+          <header style={{
+            position: 'sticky',
+            top: 16,
+            zIndex: 100,
+            marginBottom: '24px',
+            padding: '10px 14px',
+            background: 'rgba(11, 19, 38, 0.65)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
+          }}>
+            {/* Left: Identity Badge */}
+            {currentMember ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  boxShadow: '0 0 12px rgba(124, 58, 237, 0.5)'
+                }}>
+                  {currentMember.name.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1 }}>Playing as</span>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--on-surface)', lineHeight: 1.2 }}>
+                    {currentMember.name}
+                  </span>
+                </div>
+              </div>
+            ) : <div />}
+
+            {/* Right: Group Code */}
+            {group ? (
+              <button 
+                onClick={copyCode}
+                title="Copy group code"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '100px',
+                  color: 'var(--primary)',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.05em',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  fontFamily: 'var(--font-headline)'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+              >
+                <span style={{ color: 'var(--on-surface-variant)' }}>Code:</span>
+                <span>{group.code}</span>
+                <span style={{ marginLeft: '4px', fontSize: '0.9rem' }}>{copied ? '✓' : '⎘'}</span>
+              </button>
+            ) : <div />}
+          </header>
         )}
         <Outlet />
         <Copyright />

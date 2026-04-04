@@ -6,8 +6,6 @@ import { formatINR } from '../lib/currency'
 
 export default function Dashboard() {
   const { group, groupId, currentMember } = useGroup()
-  const [copied, setCopied] = useState(false)
-
   const members = group?.members || []
   const expenses = group?.expenses || []
 
@@ -34,34 +32,13 @@ export default function Dashboard() {
 
   if (!group) return null
 
-  // Fixed clipboard with real fallback (H5 fix)
-  async function copyCode() {
-    try {
-      await navigator.clipboard.writeText(group.code)
-    } catch {
-      const input = document.createElement('input')
-      input.value = group.code
-      document.body.appendChild(input)
-      input.select()
-      document.execCommand('copy')
-      document.body.removeChild(input)
-    }
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   return (
     <div className="page" id="dashboard-page">
-      {/* Group Header */}
       <div className="dash-header animate-fade-in">
         <div>
           <h1 className="headline-lg">{group.name}</h1>
           {group.description && <p className="body-md text-muted">{group.description}</p>}
         </div>
-        <button className="code-badge" onClick={copyCode} title="Copy group code" id="btn-copy-code">
-          <span className="label-md">{group.code}</span>
-          <span className="body-sm">{copied ? '✓' : '⎘'}</span>
-        </button>
       </div>
 
       {/* Members Row */}
@@ -158,25 +135,6 @@ export default function Dashboard() {
           justify-content: space-between;
           gap: var(--space-md);
           margin-bottom: var(--space-lg);
-        }
-
-        .code-badge {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          background: var(--surface-container-highest);
-          border: 1px solid rgba(74, 68, 85, 0.15);
-          border-radius: var(--radius-full);
-          color: var(--primary);
-          cursor: pointer;
-          transition: all var(--transition-fast);
-          font-family: var(--font-headline);
-          letter-spacing: 0.05em;
-        }
-
-        .code-badge:hover {
-          background: var(--surface-bright);
         }
 
         .dash-section {
