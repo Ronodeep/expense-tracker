@@ -9,7 +9,7 @@ export default function Layout() {
     <>
       <main className="container">
         {currentMember && (
-          <div style={{ position: 'absolute', top: 24, right: 16, zIndex: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '16px', paddingRight: '4px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--surface-container-highest)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--on-surface-variant)', border: '1px solid rgba(74, 68, 85, 0.3)' }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--secondary)', boxShadow: '0 0 8px var(--secondary)' }} />
               {currentMember.name}
