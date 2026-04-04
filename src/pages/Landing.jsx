@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { loadGroups, saveGroup, saveCurrentMember } from '../lib/storage'
+import { loadGroups, saveGroup, saveCurrentMember, loadGlobalProfile, saveGlobalProfile } from '../lib/storage'
 import Copyright from '../components/Copyright'
 
 /**
@@ -25,6 +25,14 @@ export default function Landing() {
   const [joinCode, setJoinCode] = useState('')
   const [joinName, setJoinName] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const profile = loadGlobalProfile()
+    if (profile && profile.name) {
+      setCreatorName(profile.name)
+      setJoinName(profile.name)
+    }
+  }, [])
 
   async function handleCreate(e) {
     e.preventDefault()
@@ -56,6 +64,7 @@ export default function Landing() {
 
       saveGroup(groupId, { ...group, members: [member], expenses: [], categories: [] })
       saveCurrentMember(groupId, member)
+      saveGlobalProfile(member.name)
       navigate(`/group/${groupId}`)
     } catch (err) {
       console.error('Failed to create group:', err)
@@ -88,6 +97,7 @@ export default function Landing() {
 
       if (existing) {
         saveCurrentMember(group.id, existing)
+        saveGlobalProfile(existing.name)
         navigate(`/group/${group.id}`)
         return
       }
@@ -105,6 +115,7 @@ export default function Landing() {
       group.members.push(member)
       saveGroup(group.id, group)
       saveCurrentMember(group.id, member)
+      saveGlobalProfile(member.name)
       navigate(`/group/${group.id}`)
     } catch (err) {
       console.error('Failed to join group:', err)

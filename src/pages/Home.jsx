@@ -1,7 +1,15 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getJoinedGroups } from '../lib/storage'
 import Copyright from '../components/Copyright'
 
 export default function Home() {
+  const [joinedGroups, setJoinedGroups] = useState([])
+
+  useEffect(() => {
+    setJoinedGroups(getJoinedGroups())
+  }, [])
+
   return (
     <div className="home-page" id="home-page">
       <div className="home-content">
@@ -16,46 +24,79 @@ export default function Home() {
           </p>
         </header>
 
-        {/* Module Cards */}
-        <section className="module-grid">
-          {/* Module 1: Split Karo — Active */}
-          <Link to="/splitkaro" className="module-card module-active animate-fade-in stagger-1" id="module-splitkaro">
-            <div className="module-badge">Live</div>
-            <div className="module-icon">💸</div>
-            <h2 className="headline-md">SplitKaro</h2>
-            <p className="body-md text-muted">
-              Split group expenses with friends. Track who paid, who owes, and settle
-              debts with the fewest transactions.
-            </p>
-            <div className="module-features">
-              <span className="module-feature-chip">⚡ Smart Splitting</span>
-              <span className="module-feature-chip">💱 Multi-Currency</span>
-              <span className="module-feature-chip">📊 Analytics</span>
+        {joinedGroups.length > 0 ? (
+          <section className="joined-groups-section animate-slide-up">
+            <div className="section-header">
+              <h2 className="headline-md">Your Groups</h2>
+              <Link to="/splitkaro" className="btn btn-primary btn-sm">
+                + New Group
+              </Link>
             </div>
-            <span className="btn btn-primary btn-sm module-cta">
-              Open SplitKaro →
-            </span>
-          </Link>
+            <div className="groups-grid">
+              {joinedGroups.map(({ group, member }) => (
+                <Link to={`/group/${group.id}`} key={group.id} className="group-card">
+                  <div className="group-card-header">
+                    <h3 className="headline-sm text-truncate text-glow">{group.name}</h3>
+                    <span className="group-code">{group.code}</span>
+                  </div>
+                  {group.description && (
+                    <p className="body-sm text-muted text-truncate">{group.description}</p>
+                  )}
+                  <div className="group-card-footer">
+                    <span className="member-badge">
+                      <span className="member-avatar">{member.name.charAt(0).toUpperCase()}</span>
+                      {member.name}
+                    </span>
+                    <span className="member-role">{member.is_creator ? 'Creator' : 'Member'}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : (
+          <>
+            {/* Module Cards */}
+            <section className="module-grid">
+              {/* Module 1: Split Karo — Active */}
+              <Link to="/splitkaro" className="module-card module-active animate-fade-in stagger-1" id="module-splitkaro">
+                <div className="module-badge">Live</div>
+                <div className="module-icon">💸</div>
+                <h2 className="headline-md">SplitKaro</h2>
+                <p className="body-md text-muted">
+                  Split group expenses with friends. Track who paid, who owes, and settle
+                  debts with the fewest transactions.
+                </p>
+                <div className="module-features">
+                  <span className="module-feature-chip">⚡ Smart Splitting</span>
+                  <span className="module-feature-chip">💱 Multi-Currency</span>
+                  <span className="module-feature-chip">📊 Analytics</span>
+                </div>
+                <span className="btn btn-primary btn-sm module-cta">
+                  Open SplitKaro →
+                </span>
+              </Link>
 
-          {/* Module 2: Personal Expense Tracking — Coming Soon */}
-          <div className="module-card module-coming-soon animate-fade-in stagger-2" id="module-personal-tracker">
-            <div className="module-badge coming-soon-badge">Coming Soon</div>
-            <div className="module-icon">📒</div>
-            <h2 className="headline-md">Personal Tracker</h2>
-            <p className="body-md text-muted">
-              Track your daily expenses, set monthly budgets, and get insights
-              into your spending habits.
-            </p>
-            <div className="module-features">
-              <span className="module-feature-chip">📅 Monthly Views</span>
-              <span className="module-feature-chip">🏷️ Tags & Labels</span>
-              <span className="module-feature-chip">🔄 Recurring</span>
-            </div>
-            <span className="btn btn-secondary btn-sm module-cta" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-              Coming in V3 🚧
-            </span>
-          </div>
-        </section>
+              {/* Module 2: Personal Expense Tracking — Coming Soon */}
+              <div className="module-card module-coming-soon animate-fade-in stagger-2" id="module-personal-tracker">
+                <div className="module-badge coming-soon-badge">Coming Soon</div>
+                <div className="module-icon">📒</div>
+                <h2 className="headline-md">Personal Tracker</h2>
+                <p className="body-md text-muted">
+                  Track your daily expenses, set monthly budgets, and get insights
+                  into your spending habits.
+                </p>
+                <div className="module-features">
+                  <span className="module-feature-chip">📅 Monthly Views</span>
+                  <span className="module-feature-chip">🏷️ Tags & Labels</span>
+                  <span className="module-feature-chip">🔄 Recurring</span>
+                </div>
+                <span className="btn btn-secondary btn-sm module-cta" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                  Coming in V3 🚧
+                </span>
+              </div>
+            </section>
+          </>
+        )}
 
         <Copyright />
       </div>
@@ -176,6 +217,103 @@ export default function Home() {
         .module-cta {
           align-self: flex-start;
           margin-top: var(--space-sm);
+        }
+
+        .joined-groups-section {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-md);
+        }
+
+        .section-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .groups-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: var(--space-md);
+        }
+
+        @media (min-width: 600px) {
+          .groups-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
+        .group-card {
+          background: var(--surface-container);
+          border-radius: var(--radius-md);
+          padding: var(--space-lg);
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-sm);
+          text-decoration: none;
+          color: inherit;
+          transition: all var(--transition-base);
+          border: 1px solid transparent;
+        }
+
+        .group-card:hover {
+          transform: translateY(-2px);
+          background: var(--surface-container-high);
+          box-shadow: var(--shadow-glow);
+          border-color: var(--primary-container);
+        }
+
+        .group-card-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: var(--space-sm);
+        }
+
+        .group-code {
+          font-family: var(--font-headline);
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+          color: var(--secondary);
+          background: rgba(78, 222, 163, 0.15);
+          padding: 2px 8px;
+          border-radius: var(--radius-sm);
+        }
+
+        .group-card-footer {
+          margin-top: auto;
+          padding-top: var(--space-md);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .member-badge {
+          display: flex;
+          align-items: center;
+          gap: var(--space-xs);
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+
+        .member-avatar {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: var(--primary);
+          color: var(--on-primary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.75rem;
+          font-weight: 700;
+        }
+
+        .member-role {
+          font-size: 0.75rem;
+          color: var(--on-surface-variant);
         }
       `}</style>
     </div>

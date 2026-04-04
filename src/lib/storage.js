@@ -90,3 +90,57 @@ export function loadCurrentMember(groupId) {
 export function saveCurrentMember(groupId, member) {
   localStorage.setItem(`currentMember_${groupId}`, JSON.stringify(member))
 }
+
+const GLOBAL_PROFILE_KEY = 'expense_tracker_profile'
+
+/**
+ * Load the global user profile.
+ * @returns {Object|null} { name: string, id?: string }
+ */
+export function loadGlobalProfile() {
+  try {
+    return JSON.parse(localStorage.getItem(GLOBAL_PROFILE_KEY) || 'null')
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Save the global user profile.
+ * @param {string} name
+ */
+export function saveGlobalProfile(name) {
+  let profile = loadGlobalProfile() || { id: crypto.randomUUID() }
+  profile.name = name
+  localStorage.setItem(GLOBAL_PROFILE_KEY, JSON.stringify(profile))
+}
+
+/**
+ * Get all groups the current browser profile has joined.
+ * @returns {Array} Array of { group, member }
+ */
+export function getJoinedGroups() {
+  const joined = []
+  const allGroups = loadGroups()
+  
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key && key.startsWith('currentMember_')) {
+      const groupId = key.substring('currentMember_'.length)
+      const memberRaw = localStorage.getItem(key)
+      if (memberRaw && allGroups[groupId]) {
+        try {
+          const member = JSON.parse(memberRaw)
+          joined.push({
+            group: allGroups[groupId],
+            member
+          })
+        } catch (e) {
+          // ignore parse errors
+        }
+      }
+    }
+  }
+  
+  return joined
+}

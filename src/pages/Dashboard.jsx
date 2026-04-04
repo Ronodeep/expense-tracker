@@ -34,13 +34,6 @@ export default function Dashboard() {
 
   return (
     <div className="page" id="dashboard-page">
-      <div className="dash-header animate-fade-in">
-        <div>
-          <h1 className="headline-lg">{group.name}</h1>
-          {group.description && <p className="body-md text-muted">{group.description}</p>}
-        </div>
-      </div>
-
       {/* Members Row */}
       <section className="dash-section animate-fade-in stagger-1">
         <div className="flex items-center justify-between">
