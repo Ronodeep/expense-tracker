@@ -379,10 +379,11 @@ textarea.input {
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
+input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px var(--surface-container-lowest) inset !important;
   -webkit-text-fill-color: var(--on-surface) !important;
   transition: background-color 5000s ease-in-out 0s;
+  caret-color: var(--on-surface);
 }
 
 /* --- Cards: "Separation of Space" (no divider lines!) --- */
@@ -748,6 +749,13 @@ input:-webkit-autofill:active{
 .recharts-wrapper, 
 .recharts-surface, 
 .recharts-sector, 
-.recharts-layer {
+.recharts-layer,
+.recharts-wrapper *,
+.recharts-surface * {
+  outline: none !important;
+}
+
+path.recharts-sector:focus-visible,
+path.recharts-sector:focus {
   outline: none !important;
 }

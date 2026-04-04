@@ -32,88 +32,91 @@ export default function Layout() {
             top: 16,
             zIndex: 100,
             marginBottom: '32px',
-            padding: '16px 20px',
-            background: 'rgba(23, 31, 51, 0.65)', /* surface-container with opacity */
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: 'none',
-            borderRadius: '24px',
+            padding: '20px 24px',
+            background: 'rgba(11, 19, 38, 0.65)', /* var(--surface) with opacity */
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(74, 68, 85, 0.1)', /* Subtle Ghost Border */
+            borderRadius: 'var(--radius-xl)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
+            gap: '20px',
             boxShadow: '0 20px 40px rgba(6, 14, 32, 0.4)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
               {/* Left: Group Name & Description */}
-              <div style={{ flex: 1, minWidth: 0, paddingRight: '16px' }}>
-                <h1 className="display-sm" style={{ margin: 0, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+              <div style={{ flex: '1 1 min-content' }}>
+                <h1 className="display-sm" style={{ margin: 0, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'var(--on-surface)' }}>
                   {group.name}
                 </h1>
                 {group.description && (
-                  <p className="body-md" style={{ color: 'var(--on-surface-variant)', margin: '4px 0 0 0' }}>
+                  <p className="body-md" style={{ color: 'var(--on-surface-variant)', margin: '6px 0 0 0' }}>
                     {group.description}
                   </p>
                 )}
               </div>
 
-              {/* Right: Identity Badge */}
-              {currentMember && (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'var(--surface-container-highest)',
-                  padding: '4px 10px',
-                  borderRadius: '100px',
-                  flexShrink: 0
-                }}>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: 'var(--secondary)',
-                    boxShadow: '0 0 8px var(--secondary)'
-                  }}></div>
-                  <span className="label-sm" style={{ color: 'var(--on-surface)' }}>{currentMember.name}</span>
-                </div>
-              )}
-            </div>
+              {/* Right: Actions & Identity */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+                {group && (
+                  <button 
+                    onClick={copyCode}
+                    title="Copy group code"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 16px',
+                      background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(210, 187, 255, 0.15))',
+                      border: '1px solid rgba(124, 58, 237, 0.3)',
+                      borderRadius: 'var(--radius-full)',
+                      color: 'var(--primary)',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(210, 187, 255, 0.25))'
+                      e.currentTarget.style.borderColor = 'rgba(124, 58, 237, 0.5)'
+                      e.currentTarget.style.transform = 'scale(1.02)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(210, 187, 255, 0.15))'
+                      e.currentTarget.style.borderColor = 'rgba(124, 58, 237, 0.3)'
+                      e.currentTarget.style.transform = 'scale(1)'
+                    }}
+                  >
+                    <span style={{ color: 'var(--on-surface-variant)', fontWeight: 500 }}>Code:</span>
+                    <span style={{ fontFamily: 'var(--font-headline)', letterSpacing: '0.05em' }}>{group.code}</span>
+                    <span style={{ fontSize: '1rem', marginLeft: '4px' }}>{copied ? '✓' : '⎘'}</span>
+                  </button>
+                )}
 
-            {/* Bottom: Group Code / Invite Pill */}
-            {group && (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button 
-                  onClick={copyCode}
-                  title="Copy group code"
-                  style={{
+                {currentMember && (
+                  <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    padding: '8px 16px',
-                    background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(210, 187, 255, 0.15))',
-                    border: '1px solid rgba(124, 58, 237, 0.3)',
-                    borderRadius: '100px',
-                    color: 'var(--primary-container)',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(210, 187, 255, 0.25))'
-                    e.currentTarget.style.borderColor = 'rgba(124, 58, 237, 0.5)'
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(210, 187, 255, 0.15))'
-                    e.currentTarget.style.borderColor = 'rgba(124, 58, 237, 0.3)'
-                  }}
-                >
-                  <span style={{ color: 'var(--on-surface-variant)' }}>Invite Code:</span>
-                  <span style={{ fontFamily: 'var(--font-headline)', letterSpacing: '0.05em', color: 'var(--primary)' }}>{group.code}</span>
-                  <span style={{ fontSize: '1rem', marginLeft: '2px' }}>{copied ? '✓' : '⎘'}</span>
-                </button>
+                    background: 'var(--surface-container-lowest)',
+                    border: '1px solid rgba(74, 68, 85, 0.2)',
+                    padding: '6px 12px',
+                    borderRadius: 'var(--radius-full)',
+                  }}>
+                    <div style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      background: 'var(--tertiary)',
+                      boxShadow: '0 0 8px var(--tertiary)'
+                    }}></div>
+                    <span className="label-md" style={{ color: 'var(--on-surface-variant)' }}>
+                      Acting as: <strong style={{ color: 'var(--on-surface)', fontWeight: 600 }}>{currentMember.name}</strong>
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </header>
         )}
         <Outlet />
