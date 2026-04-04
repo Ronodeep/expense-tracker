@@ -24,7 +24,7 @@ export default function Home() {
           </p>
         </header>
 
-        {joinedGroups.length > 0 ? (
+        {joinedGroups.length > 0 && (
           <section className="joined-groups-section animate-slide-up">
             <div className="section-header">
               <h2 className="headline-md">Your Groups</h2>
@@ -53,50 +53,49 @@ export default function Home() {
               ))}
             </div>
           </section>
-        ) : (
-          <>
-            {/* Module Cards */}
-            <section className="module-grid">
-              {/* Module 1: Split Karo — Active */}
-              <Link to="/splitkaro" className="module-card module-active animate-fade-in stagger-1" id="module-splitkaro">
-                <div className="module-badge">Live</div>
-                <div className="module-icon">💸</div>
-                <h2 className="headline-md">SplitKaro</h2>
-                <p className="body-md text-muted">
-                  Split group expenses with friends. Track who paid, who owes, and settle
-                  debts with the fewest transactions.
-                </p>
-                <div className="module-features">
-                  <span className="module-feature-chip">⚡ Smart Splitting</span>
-                  <span className="module-feature-chip">💱 Multi-Currency</span>
-                  <span className="module-feature-chip">📊 Analytics</span>
-                </div>
-                <span className="btn btn-primary btn-sm module-cta">
-                  Open SplitKaro →
-                </span>
-              </Link>
-
-              {/* Module 2: Personal Expense Tracking — Coming Soon */}
-              <div className="module-card module-coming-soon animate-fade-in stagger-2" id="module-personal-tracker">
-                <div className="module-badge coming-soon-badge">Coming Soon</div>
-                <div className="module-icon">📒</div>
-                <h2 className="headline-md">Personal Tracker</h2>
-                <p className="body-md text-muted">
-                  Track your daily expenses, set monthly budgets, and get insights
-                  into your spending habits.
-                </p>
-                <div className="module-features">
-                  <span className="module-feature-chip">📅 Monthly Views</span>
-                  <span className="module-feature-chip">🏷️ Tags & Labels</span>
-                  <span className="module-feature-chip">🔄 Recurring</span>
-                </div>
-                <span className="btn btn-secondary btn-sm module-cta" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-                  Coming in V3 🚧
-                </span>
-              </div>
-            </section>
-          </>
         )}
+
+        <section className="module-grid" style={{ marginTop: joinedGroups.length > 0 ? 'var(--space-sm)' : 0 }}>
+          {/* Module 1: Split Karo — Active (Only show if no groups) */}
+          {joinedGroups.length === 0 && (
+            <Link to="/splitkaro" className="module-card module-active animate-fade-in stagger-1" id="module-splitkaro">
+              <div className="module-badge">Live</div>
+              <div className="module-icon">💸</div>
+              <h2 className="headline-md">SplitKaro</h2>
+              <p className="body-md text-muted">
+                Split group expenses with friends. Track who paid, who owes, and settle
+                debts with the fewest transactions.
+              </p>
+              <div className="module-features">
+                <span className="module-feature-chip">⚡ Smart Splitting</span>
+                <span className="module-feature-chip">💱 Multi-Currency</span>
+                <span className="module-feature-chip">📊 Analytics</span>
+              </div>
+              <span className="btn btn-primary btn-sm module-cta">
+                Open SplitKaro →
+              </span>
+            </Link>
+          )}
+
+          {/* Module 2: Personal Expense Tracking — Coming Soon */}
+          <div className="module-card module-coming-soon animate-fade-in stagger-2" id="module-personal-tracker">
+            <div className="module-badge coming-soon-badge">Coming Soon</div>
+            <div className="module-icon">📒</div>
+            <h2 className="headline-md">Personal Tracker</h2>
+            <p className="body-md text-muted">
+              Track your daily expenses, set monthly budgets, and get insights
+              into your spending habits.
+            </p>
+            <div className="module-features">
+              <span className="module-feature-chip">📅 Monthly Views</span>
+              <span className="module-feature-chip">🏷️ Tags & Labels</span>
+              <span className="module-feature-chip">🔄 Recurring</span>
+            </div>
+            <span className="btn btn-secondary btn-sm module-cta" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+              Coming in V3 🚧
+            </span>
+          </div>
+        </section>
 
         <Copyright />
       </div>
