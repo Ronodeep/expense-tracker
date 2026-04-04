@@ -76,13 +76,22 @@ export default function ExpensesList() {
                   <span className="body-sm text-muted">
                     Split ({exp.split_type?.toLowerCase()}) among {splitNames.length}: {splitNames.join(', ')}
                   </span>
-                  <button
-                    className="btn btn-tertiary btn-sm"
-                    onClick={() => deleteExpense(exp.id)}
-                    style={{ color: 'var(--error)', padding: '4px 8px' }}
-                  >
-                    Delete
-                  </button>
+                  <div className="flex gap-sm">
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => navigate(`/group/${groupId}/edit/${exp.id}`)}
+                      style={{ padding: '4px 8px' }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-tertiary btn-sm"
+                      onClick={() => deleteExpense(exp.id)}
+                      style={{ color: 'var(--error)', padding: '4px 8px' }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             )

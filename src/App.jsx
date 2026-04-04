@@ -22,6 +22,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="expenses" element={<ExpensesList />} />
         <Route path="add" element={<AddExpense />} />
+        <Route path="edit/:expenseId" element={<AddExpense />} />
         <Route path="settlement" element={<Settlement />} />
         <Route path="charts" element={<Charts />} />
       </Route>

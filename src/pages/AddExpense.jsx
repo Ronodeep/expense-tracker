@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useGroup } from '../hooks/useGroup'
 import { PREDEFINED_CATEGORIES, getCategoryConfig } from '../data/categories'
 import { CURRENCIES, formatCurrency } from '../lib/currency'
@@ -9,6 +9,8 @@ import { SPLIT_TYPES, SPLIT_TYPE_LABELS } from '../lib/constants'
 export default function AddExpense() {
   const { group, groupId, currentMember } = useGroup()
   const navigate = useNavigate()
+  const { expenseId } = useParams()
+  const isEditMode = !!expenseId
 
   // Form state
   const [description, setDescription] = useState('')
@@ -31,18 +33,55 @@ export default function AddExpense() {
   const [loading, setLoading] = useState(false)
   const [initialized, setInitialized] = useState(false)
 
-  // Initialize split members once group loads
+  // Initialize form state
   if (group && !initialized) {
-    const splits = {}
-    const vals = {}
-    group.members.forEach(m => {
-      splits[m.id] = true
-      vals[m.id] = ''
-    })
-    setSplitMembers(splits)
-    setSplitValues(vals)
-    if (currentMember && Object.keys(payers).length === 0) {
-      setPayers({ [currentMember.id]: '' })
+    const expToEdit = isEditMode ? group.expenses?.find(e => e.id === expenseId) : null
+
+    if (expToEdit) {
+      setDescription(expToEdit.description)
+      setAmount(expToEdit.total_amount.toString())
+      setCurrency(expToEdit.currency || 'INR')
+      setConversionRate((expToEdit.conversion_rate || 1).toString())
+      
+      const isPredefined = PREDEFINED_CATEGORIES.some(c => c.name === expToEdit.category)
+      setCategory(isPredefined ? expToEdit.category : 'Other')
+      if (!isPredefined) setCustomCategory(expToEdit.category)
+      
+      if (expToEdit.expense_date) {
+        setExpenseDate(expToEdit.expense_date.split('T')[0])
+      }
+      setSplitType(expToEdit.split_type || SPLIT_TYPES.EQUAL)
+
+      if (expToEdit.payers && expToEdit.payers.length > 0) {
+        setMultiPayer(expToEdit.payers.length > 1)
+        const initialPayers = {}
+        expToEdit.payers.forEach(p => { initialPayers[p.member_id] = p.amount_paid.toString() })
+        setPayers(initialPayers)
+      }
+
+      if (expToEdit.splits) {
+        const sMembers = {}
+        const sValues = {}
+        group.members.forEach(m => {
+          const splitData = expToEdit.splits.find(s => s.member_id === m.id)
+          sMembers[m.id] = !!splitData
+          sValues[m.id] = splitData ? splitData.split_value.toString() : ''
+        })
+        setSplitMembers(sMembers)
+        setSplitValues(sValues)
+      }
+    } else {
+      const splits = {}
+      const vals = {}
+      group.members.forEach(m => {
+        splits[m.id] = true
+        vals[m.id] = ''
+      })
+      setSplitMembers(splits)
+      setSplitValues(vals)
+      if (currentMember && Object.keys(payers).length === 0) {
+        setPayers({ [currentMember.id]: '' })
+      }
     }
     setInitialized(true)
   }
@@ -83,7 +122,7 @@ export default function AddExpense() {
 
     setLoading(true)
     try {
-      const expenseId = crypto.randomUUID()
+      const newExpId = crypto.randomUUID()
       const rate = parseFloat(conversionRate) || 1
 
       const payersList = []
@@ -106,7 +145,7 @@ export default function AddExpense() {
       }))
 
       const expense = {
-        id: expenseId,
+        id: isEditMode ? expenseId : newExpId,
         group_id: groupId,
         description: description.trim(),
         total_amount: totalAmount,
@@ -115,20 +154,24 @@ export default function AddExpense() {
         category: effectiveCategory,
         category_icon: catConfig.icon,
         expense_date: expenseDate,
-        created_by: currentMember?.id,
+        created_by: isEditMode ? group.expenses.find(e => e.id === expenseId)?.created_by || currentMember?.id : currentMember?.id,
         split_type: splitType,
-        created_at: new Date().toISOString(),
+        created_at: isEditMode ? group.expenses.find(e => e.id === expenseId)?.created_at || new Date().toISOString() : new Date().toISOString(),
         payers: payersList,
         splits: splitsList,
       }
 
       const updatedGroup = { ...group }
-      updatedGroup.expenses = [...(updatedGroup.expenses || []), expense]
+      if (isEditMode) {
+        updatedGroup.expenses = updatedGroup.expenses.map(e => e.id === expenseId ? expense : e)
+      } else {
+        updatedGroup.expenses = [...(updatedGroup.expenses || []), expense]
+      }
       saveGroup(groupId, updatedGroup)
 
       navigate(`/group/${groupId}`)
     } catch (err) {
-      console.error('Failed to add expense:', err)
+      console.error('Failed to add/update expense:', err)
     } finally {
       setLoading(false)
     }
@@ -139,7 +182,7 @@ export default function AddExpense() {
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate(-1)} id="btn-back">←</button>
         <div>
-          <h1 className="headline-md">Add Expense</h1>
+          <h1 className="headline-md">{isEditMode ? 'Edit Expense' : 'Add Expense'}</h1>
           <p className="body-sm text-muted">{group.name}</p>
         </div>
       </div>
