@@ -13,7 +13,7 @@
 
 ```mermaid
 graph TB
-    subgraph "Frontend — Vite + React (Vercel Free)"
+    subgraph "Frontend — Vite + React (GitHub Pages)"
         A[Landing Page] --> B[Group Dashboard]
         B --> C[Add Expense]
         B --> D[Expenses List]
@@ -43,7 +43,7 @@ graph TB
 | **Styling** | Vanilla CSS (design system tokens) | Free |
 | **Database** | Supabase PostgreSQL (500MB free) | Free |
 | **Realtime** | Supabase Realtime subscriptions | Free |
-| **Hosting** | Vercel (static SPA) | Free |
+| **Hosting** | GitHub Pages (static SPA) | Free |
 | **Total** | | **$0/month** |
 
 ---
@@ -281,30 +281,30 @@ expense-tracker/
 ## 7. Phased Delivery Plan
 
 ### Phase 1: Foundation (Day 1-2)
-- [ ] Initialize Vite + React project
-- [ ] Set up Supabase project & database schema
-- [ ] Create CSS design system (tokens from Stitch)
-- [ ] Set up React Router with all routes
-- [ ] Implement Supabase client initialization
-- [ ] Create Layout component with bottom navigation
+- [x] Initialize Vite + React project
+- [x] Set up Supabase project & database schema
+- [x] Create CSS design system (tokens from Stitch)
+- [x] Set up React Router with all routes
+- [x] Implement Supabase client initialization
+- [x] Create Layout component with bottom navigation
 
 ### Phase 2: Group Management (Day 2-3)
-- [ ] Landing page — Create Group form (name, description, code)
-- [ ] Landing page — Join Group form (enter code + name)
-- [ ] Group creation with auto-generated code
-- [ ] Member joining flow
-- [ ] Shareable group link generation
-- [ ] localStorage to remember current member identity
+- [x] Landing page — Create Group form (name, description, code)
+- [x] Landing page — Join Group form (enter code + name)
+- [x] Group creation with auto-generated code
+- [x] Member joining flow
+- [x] Shareable group link generation
+- [x] localStorage to remember current member identity
 
 ### Phase 3: Expense Management (Day 3-5)
-- [ ] Add Expense form with all fields
-- [ ] Category selection (predefined + custom)
-- [ ] Payer selector (single + multiple payers)
-- [ ] Split selector (Equal / Ratio / Percentage / Exact)
-- [ ] Currency input with conversion rate
-- [ ] Expense list view with filters
-- [ ] Expense detail view
-- [ ] Edit / delete expense
+- [x] Add Expense form with all fields
+- [x] Category selection (predefined + custom)
+- [x] Payer selector (single + multiple payers)
+- [x] Split selector (Equal / Ratio / Percentage / Exact)
+- [x] Currency input with conversion rate
+- [x] Expense list view with filters
+- [x] Expense detail view
+- [x] Edit / delete expense
 
 ### Phase 4: Settlement (Day 5-6)
 - [ ] Implement minimum transaction settlement algorithm
@@ -335,7 +335,7 @@ expense-tracker/
 
 ```mermaid
 graph LR
-    A[Git Push to GitHub] -->|Auto-deploy| B[Vercel]
+    A[Git Push to GitHub] -->|gh-pages branch| B[GitHub Pages]
     B --> C[Static SPA served via CDN]
     C -->|API calls| D[Supabase Cloud]
     D --> E[(PostgreSQL)]
@@ -344,12 +344,12 @@ graph LR
 | Step | Action |
 |------|--------|
 | 1 | Create GitHub repo `expense-tracker` |
-| 2 | Connect repo to Vercel (free account) |
-| 3 | Create Supabase project (free tier) |
-| 4 | Add Supabase URL + anon key as Vercel env vars |
-| 5 | Push code → auto-deploys |
+| 2 | Configure `vite.config.js` with `base: '/expense-tracker/'` |
+| 3 | Use `gh-pages` npm package to deploy `dist` |
+| 4 | Configure GitHub repository pages settings to deploy from `gh-pages` |
+| 5 | Run `npm run deploy` → auto-pushes to branch |
 
-**Free subdomain**: `splitkaro.vercel.app` (or custom domain if you have one)
+**Free subdomain**: `https://<username>.github.io/expense-tracker`
 
 ---
 
@@ -360,7 +360,7 @@ graph LR
 | 1 | **Name-based identity** (no auth) | OAuth, magic links, email-based | Simplest MVP; auth adds complexity and cost |
 | 2 | **Supabase** for backend/DB | Google Sheets, Firebase, Turso, localStorage | Relational DB (perfect for splits), free tier, realtime, built-in auth for later |
 | 3 | **Vite + React** for frontend | Next.js, Vue, Svelte | No SSR needed, simplest deployment as static SPA, large ecosystem |
-| 4 | **Vercel** for hosting | Netlify, GitHub Pages, Cloudflare Pages | Best integration with Git, instant deploys, free tier |
+| 4 | **GitHub Pages** for hosting | Vercel, Netlify, Cloudflare Pages | Best integration with Git, zero config inside GitHub, completely free |
 | 5 | **Minimum transaction settlement** | Direct pair debts | Better UX, fewer transfers needed, what Splitwise does |
 | 6 | **Predefined + Custom categories** | Predefined only, fully custom | Best of both worlds — quick selection + flexibility |
 | 7 | **Recharts** for visualizations | Chart.js, D3, Nivo | React-native, declarative API, lightweight |

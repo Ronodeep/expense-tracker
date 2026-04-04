@@ -33,7 +33,7 @@ A zero-cost, group expense splitting web app. Think Splitwise, but self-hosted a
 | Charts | Recharts | Free |
 | Styling | Vanilla CSS (design tokens) | Free |
 | Database | localStorage (Supabase schema ready) | Free |
-| Hosting | Vercel (static SPA) | Free |
+| Hosting | GitHub Pages (static SPA) | Free |
 | **Total** | | **$0/month** |
 
 ---
@@ -59,11 +59,11 @@ npm run dev
 
 The app will be available at `http://localhost:5173/`.
 
-### Build for Production
+### Build & Deploy for Production
 
 ```bash
-npm run build
-npm run preview
+# Push to the gh-pages branch
+npm run deploy
 ```
 
 ---
@@ -162,6 +162,7 @@ All amounts are converted to INR using the expense's conversion rate before calc
 | Vite + React | No SSR needed, simplest SPA deployment |
 | Static currency conversion | Zero cost, user controls the rate |
 | Recharts | React-native, declarative API, lightweight |
+| GitHub Pages hosting | Seamless Git integration, zero configuration and completely free |
 
 ---
 
