@@ -1,17 +1,28 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGroup } from '../hooks/useGroup'
 import MemberAvatar from '../components/MemberAvatar'
 import { computeSettlement } from '../lib/settlement'
 import { formatINR } from '../lib/currency'
+import { archiveGroup } from '../lib/storage'
 
 export default function Settlement() {
   const { group, groupId } = useGroup()
   const navigate = useNavigate()
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
 
   if (!group) return null
   const members = group.members || []
   const expenses = group.expenses || []
   const { balances, transactions } = computeSettlement(expenses, members)
+
+  const allSettled = expenses.length > 0 && transactions.length === 0
+  const isArchived = group.is_archived
+
+  const handleArchive = () => {
+    archiveGroup(groupId)
+    navigate('/')
+  }
 
   return (
     <div className="page" id="settlement-page">
@@ -38,6 +49,34 @@ export default function Settlement() {
                 : `${transactions.length} transaction${transactions.length > 1 ? 's' : ''} to settle`}
             </span>
           </div>
+
+          {/* Archive Prompt — only when fully settled and not already archived */}
+          {allSettled && !isArchived && (
+            <div className="archive-prompt animate-fade-in" id="archive-prompt">
+              <div className="archive-prompt-icon">🎉</div>
+              <h3 className="title-md">All debts are settled!</h3>
+              <p className="body-sm text-muted">
+                This group is fully settled. Archive it to keep your dashboard clean. You can always restore or permanently delete it later.
+              </p>
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowArchiveConfirm(true)}
+                id="btn-archive-group"
+              >
+                📦 Archive Group
+              </button>
+            </div>
+          )}
+
+          {isArchived && (
+            <div className="archive-prompt animate-fade-in" style={{ borderColor: 'var(--outline-variant)' }}>
+              <div className="archive-prompt-icon">📦</div>
+              <h3 className="title-md">This group is archived</h3>
+              <p className="body-sm text-muted">
+                You can restore it or permanently delete it from the Home screen.
+              </p>
+            </div>
+          )}
 
           {transactions.map((txn, i) => (
             <div key={i} className="card animate-fade-in" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -70,6 +109,95 @@ export default function Settlement() {
           ))}
         </>
       )}
+
+      {/* Archive Confirmation Dialog */}
+      {showArchiveConfirm && (
+        <div className="dialog-overlay" onClick={() => setShowArchiveConfirm(false)}>
+          <div className="dialog-box" onClick={e => e.stopPropagation()}>
+            <div className="dialog-icon">📦</div>
+            <h3 className="headline-sm">Archive this group?</h3>
+            <p className="body-md text-muted">
+              "{group.name}" will be moved to your Archived Groups. You can restore it or permanently delete it later.
+            </p>
+            <div className="dialog-actions">
+              <button className="btn btn-secondary" onClick={() => setShowArchiveConfirm(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleArchive} id="btn-confirm-archive">Archive</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .archive-prompt {
+          background: var(--surface-container-high);
+          border-radius: var(--radius-md);
+          padding: var(--space-xl) var(--space-lg);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-sm);
+          text-align: center;
+          margin-bottom: var(--space-lg);
+          border: 1px solid rgba(78, 222, 163, 0.2);
+        }
+
+        .archive-prompt-icon {
+          font-size: 2.5rem;
+        }
+
+        /* Confirmation Dialog */
+        .dialog-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: var(--space-lg);
+          animation: fade-in var(--transition-base) ease;
+        }
+
+        .dialog-box {
+          background: var(--surface-container-high);
+          border-radius: var(--radius-lg);
+          padding: var(--space-xl);
+          max-width: 380px;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-md);
+          text-align: center;
+          animation: slide-up var(--transition-base) ease;
+        }
+
+        .dialog-icon {
+          font-size: 3rem;
+        }
+
+        .dialog-actions {
+          display: flex;
+          gap: var(--space-md);
+          width: 100%;
+          margin-top: var(--space-sm);
+        }
+
+        .dialog-actions .btn {
+          flex: 1;
+        }
+
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   )
 }

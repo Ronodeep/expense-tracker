@@ -144,3 +144,53 @@ export function getJoinedGroups() {
   
   return joined
 }
+
+/**
+ * Archive a group (soft-delete). Sets is_archived and archived_at.
+ * @param {string} groupId
+ */
+export function archiveGroup(groupId) {
+  const all = loadGroups()
+  if (all[groupId]) {
+    all[groupId].is_archived = true
+    all[groupId].archived_at = Date.now()
+    saveGroups(all)
+  }
+}
+
+/**
+ * Restore an archived group back to active.
+ * @param {string} groupId
+ */
+export function restoreGroup(groupId) {
+  const all = loadGroups()
+  if (all[groupId]) {
+    delete all[groupId].is_archived
+    delete all[groupId].archived_at
+    saveGroups(all)
+  }
+}
+
+/**
+ * Permanently delete a group and clean up its member key from localStorage.
+ * @param {string} groupId
+ */
+export function permanentlyDeleteGroup(groupId) {
+  const all = loadGroups()
+  delete all[groupId]
+  saveGroups(all)
+  localStorage.removeItem(`currentMember_${groupId}`)
+}
+
+/**
+ * Permanently delete ALL archived groups.
+ */
+export function deleteAllArchivedGroups() {
+  const all = loadGroups()
+  const toDelete = Object.keys(all).filter(id => all[id].is_archived)
+  toDelete.forEach(id => {
+    delete all[id]
+    localStorage.removeItem(`currentMember_${id}`)
+  })
+  saveGroups(all)
+}

@@ -68,6 +68,8 @@ erDiagram
         text description
         text default_currency
         float conversion_rate
+        boolean is_archived
+        timestamp archived_at
         timestamp created_at
     }
 
@@ -127,6 +129,8 @@ erDiagram
 | description | TEXT | Optional |
 | default_currency | TEXT | Default "INR" |
 | conversion_rate | FLOAT | Default 1.0 (INR to INR) |
+| is_archived | BOOLEAN | True if the group is archived |
+| archived_at | TIMESTAMPTZ | When it was archived |
 | created_at | TIMESTAMPTZ | Auto |
 
 #### `members`
@@ -328,6 +332,13 @@ expense-tracker/
 - [ ] Micro-animations & transitions
 - [ ] Deploy to Vercel
 - [ ] README documentation
+
+### Phase 7: Group Archival and Cleanup (Day 8-9)
+- [ ] Add `is_archived` and `archived_at` flags to Supabase `groups` table
+- [ ] Group Dashboard: Detect when `total balances = 0` and show "Archive Group" prompt
+- [ ] Create an "Archived Groups" tab/section on the Home/Landing page
+- [ ] Top banner nudge: "You have old archived groups. Permanently delete them to save space in the free tier."
+- [ ] Manual "Permanently Delete" functionality to wipe group and all relational expenses from DB
 
 ---
 
