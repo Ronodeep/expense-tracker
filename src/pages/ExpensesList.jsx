@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGroup } from '../hooks/useGroup'
 import { getCategoryConfig } from '../data/categories'
@@ -7,6 +8,7 @@ import { loadGroup, saveGroup } from '../lib/storage'
 export default function ExpensesList() {
   const { group, groupId, refresh } = useGroup()
   const navigate = useNavigate()
+  const [deleteTarget, setDeleteTarget] = useState(null) // expense object or null
 
   if (!group) return null
 
@@ -17,14 +19,19 @@ export default function ExpensesList() {
     return members.find(m => m.id === id)?.name || 'Unknown'
   }
 
-  function deleteExpense(expenseId) {
-    if (!confirm('Delete this expense?')) return
+  function confirmDelete(expense) {
+    setDeleteTarget(expense)
+  }
+
+  function executeDelete() {
+    if (!deleteTarget) return
     const current = loadGroup(groupId)
     if (current) {
-      current.expenses = current.expenses.filter(e => e.id !== expenseId)
+      current.expenses = current.expenses.filter(e => e.id !== deleteTarget.id)
       saveGroup(groupId, current)
       refresh()
     }
+    setDeleteTarget(null)
   }
 
   return (
@@ -86,7 +93,7 @@ export default function ExpensesList() {
                     </button>
                     <button
                       className="btn btn-tertiary btn-sm"
-                      onClick={() => deleteExpense(exp.id)}
+                      onClick={() => confirmDelete(exp)}
                       style={{ color: 'var(--error)', padding: '4px 8px' }}
                     >
                       Delete
@@ -96,6 +103,31 @@ export default function ExpensesList() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Custom Delete Confirmation Dialog */}
+      {deleteTarget && (
+        <div className="dialog-overlay" onClick={() => setDeleteTarget(null)} id="delete-dialog-overlay">
+          <div className="dialog-box" onClick={e => e.stopPropagation()}>
+            <div className="dialog-icon">🗑️</div>
+            <h3 className="headline-sm">Delete this expense?</h3>
+            <div className="delete-expense-preview">
+              <span className="body-md" style={{ fontWeight: 600 }}>{deleteTarget.description}</span>
+              <span className="body-md text-primary" style={{ fontWeight: 700 }}>
+                {formatINR(deleteTarget.total_amount * (deleteTarget.conversion_rate || 1))}
+              </span>
+            </div>
+            <p className="body-sm text-muted">
+              This action cannot be undone. The expense and all associated splits will be permanently removed.
+            </p>
+            <div className="dialog-actions">
+              <button className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>Cancel</button>
+              <button className="btn btn-danger" onClick={executeDelete} id="btn-confirm-delete-expense">
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -139,6 +171,88 @@ export default function ExpensesList() {
           display: flex;
           justify-content: space-between;
           align-items: center;
+        }
+
+        /* Delete Confirmation Dialog */
+        .dialog-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: var(--space-lg);
+          animation: fade-in var(--transition-base) ease;
+        }
+
+        .dialog-box {
+          background: var(--surface-container-high);
+          border-radius: var(--radius-lg);
+          padding: var(--space-xl);
+          max-width: 380px;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: var(--space-md);
+          text-align: center;
+          animation: slide-up var(--transition-base) ease;
+        }
+
+        .dialog-icon {
+          font-size: 3rem;
+        }
+
+        .delete-expense-preview {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: var(--space-md);
+          background: var(--surface-container-lowest);
+          border-radius: var(--radius-sm);
+        }
+
+        .dialog-actions {
+          display: flex;
+          gap: var(--space-md);
+          width: 100%;
+          margin-top: var(--space-sm);
+        }
+
+        .dialog-actions .btn {
+          flex: 1;
+        }
+
+        .btn-danger {
+          background: var(--error-container);
+          color: var(--on-error-container);
+          border: none;
+          cursor: pointer;
+          padding: 8px 16px;
+          border-radius: var(--radius-full);
+          font-family: var(--font-body);
+          font-weight: 600;
+          font-size: 0.875rem;
+          transition: all var(--transition-base);
+        }
+
+        .btn-danger:hover {
+          background: var(--error);
+          color: var(--on-error);
+          transform: translateY(-1px);
+        }
+
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
